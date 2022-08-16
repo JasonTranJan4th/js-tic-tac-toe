@@ -2,10 +2,11 @@ import {
     getCellElementAtIdx,
     getCurrentTurnElement,
     getGameStatusElement,
-    getCellElementList
+    getCellElementList,
+    getReplayButtonElement
 } from './selectors.js';
 
-import { TURN } from './constants.js';
+import { CELL_VALUE, GAME_STATUS, TURN } from './constants.js';
 import { checkGameStatus } from './utils.js';
 
 console.log(checkGameStatus(['X', 'O', 'O', '', 'X', '', '', 'O', 'X']));
@@ -15,6 +16,7 @@ console.log(checkGameStatus(['X', 'O', 'O', '', 'X', '', '', 'O', 'X']));
  */
 let currentTurn = TURN.CROSS;
 let isGameEnded = false;
+let gameStatus = GAME_STATUS.PLAYING;
 let cellValues = new Array(9).fill("");
 
 function toggleTurn() {
@@ -29,17 +31,82 @@ function toggleTurn() {
     }
 }
 
+function updateGameStatus(newGameStatus) {
+    gameStatus = newGameStatus;
+
+    const gameStatusEle = getGameStatusElement();
+
+    if (gameStatusEle) gameStatusEle.textContent = gameStatus;
+}
+
+function showReplayButton() {
+    const replayButton = getReplayButtonElement();
+
+    if (replayButton) replayButton.classList.add('show');
+}
+
+function hideReplayButton() {
+    const replayButton = getReplayButtonElement();
+
+    if (replayButton) replayButton.classList.remove('show');
+}
+
+function highLightWinCell(winPositions) {
+    if (!Array.isArray(winPositions) || winPositions.length !== 3) {
+        throw new Error('Invalid win position');
+    }
+
+    for (const position of winPositions) {
+        const cell = getCellElementAtIdx(position);
+
+        if (cell) cell.classList.add('win');
+    }
+}
+
 function handleCellClick(cell, index) {
 
     //check cell clicked or not
     const isClicked = cell.classList.contains(TURN.CIRCLE) || cell.classList.contains(TURN.CROSS);
-    if (isClicked) return;
+    const isEndGame = gameStatus !== GAME_STATUS.PLAYING;
+    if (isClicked || isEndGame) return; // nếu đã click vào từng ô rồi hoặc khi game kết thúc rồi thì ko dc click nữa
 
     //set selected cell
     cell.classList.add(currentTurn);
 
+    //đưa giá trị của ô dc click vào mảng cellValues dùng để check win or not
+    cellValues[index] = currentTurn === TURN.CIRCLE ? CELL_VALUE.CIRCLE : CELL_VALUE.CROSS;
+
     //toggle turn
     toggleTurn();
+
+    //check win or not
+    const game = checkGameStatus(cellValues);
+
+    switch (game.status) {
+        case GAME_STATUS.ENDED: {
+            //update game status
+            updateGameStatus(game.status);
+            //show replay button
+            showReplayButton();
+            break;
+        }
+
+        case GAME_STATUS.X_WIN:
+        case GAME_STATUS.O_WIN: {
+            //update game status
+            updateGameStatus(game.status);
+
+            //show replay button
+            showReplayButton();
+
+            //highlight win cell 
+            highLightWinCell(game.winPositions);
+            break;
+        }
+
+        default:
+        //is playing
+    }
 }
 
 function initCellElementList() {
@@ -48,6 +115,41 @@ function initCellElementList() {
     cellElementList.forEach((cell, index) => {
         cell.addEventListener('click', () => handleCellClick(cell, index));
     })
+}
+
+function resetGame() {
+    //reset các variable
+    currentTurn = TURN.CROSS;
+    gameStatus = GAME_STATUS.PLAYING;
+    cellValues = cellValues.map(() => ""); // chuyen tat ca cac ptu trong mang thanh chuoi rong
+
+    // reset dom ele bao gồm:
+    //reset game status
+    updateGameStatus(GAME_STATUS.PLAYING);
+
+    //reset current turn
+    const currentTurnEle = getCurrentTurnElement();
+    if (currentTurnEle) {
+        currentTurnEle.classList.remove(TURN.CIRCLE, TURN.CROSS);
+        currentTurnEle.classList.add(TURN.CROSS);
+    }
+
+    //reset gameboard
+    const cellEleList = getCellElementList();
+    for (const cellEle of cellEleList) {
+        cellEle.className = ''; //clear toan bo class co trong ele
+    }
+
+    //hide replay button
+    hideReplayButton();
+}
+
+function initReplayButton() {
+    const replayButton = getReplayButtonElement();
+
+    if (replayButton) {
+        replayButton.addEventListener('click', resetGame)
+    }
 }
 
 /**
@@ -70,4 +172,7 @@ function initCellElementList() {
 (() => {
     //bind click event for all li element
     initCellElementList();
+
+    //handle replay button
+    initReplayButton();
 })();

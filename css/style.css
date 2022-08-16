@@ -32,7 +32,7 @@ ul {
   text-align: center;
 }
 
-.game .chalk-board > img {
+.game .chalk-board>img {
   width: 100%;
 }
 
@@ -57,40 +57,44 @@ ul {
 }
 
 /* Board cell */
-.game .board-cells-list > li {
+.game .board-cells-list>li {
   position: relative;
   width: 33.333333%;
   height: 50px;
   border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
-.game .board-cells-list > li.win {
+/* .game .board-cells-list > li.win {
+  background: rgba(255, 255, 255, 0.1);
+} */
+
+.win {
   background: rgba(255, 255, 255, 0.1);
 }
 
 /* Add hover effect on cell hover */
-.game .board-cells-list > li:hover {
+.game .board-cells-list>li:hover {
   cursor: pointer;
   background: rgba(255, 255, 255, 0.1);
 }
 
 /* Remove hover effect if cell already clicked */
-.game .board-cells-list > li:hover.cross,
-.game .board-cells-list > li:hover.circle {
+.game .board-cells-list>li:hover.cross,
+.game .board-cells-list>li:hover.circle {
   background: transparent;
   cursor: default;
 }
 
-.game .board-cells-list > li:not(:nth-child(3n)) {
+.game .board-cells-list>li:not(:nth-child(3n)) {
   border-right: none;
 }
 
-.game .board-cells-list > li:nth-child(-n + 6) {
+.game .board-cells-list>li:nth-child(-n + 6) {
   border-bottom: none;
 }
 
-.game .board-cells-list > li.cross::before,
-.game .board-cells-list > li.circle::before {
+.game .board-cells-list>li.cross::before,
+.game .board-cells-list>li.circle::before {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -117,13 +121,13 @@ ul {
   font-weight: bold;
 }
 
-.game .board-cells-list > li.cross::before,
+.game .board-cells-list>li.cross::before,
 .game .game-details .current-turn .cross::before {
   content: "X";
   color: lightgreen;
 }
 
-.game .board-cells-list > li.circle::before,
+.game .board-cells-list>li.circle::before,
 .game .game-details .current-turn .circle::before {
   content: "O";
   color: red;
@@ -142,7 +146,7 @@ ul {
   text-transform: uppercase;
 }
 
-.game-status > span {
+.game-status>span {
   color: white;
 }
 
@@ -150,15 +154,15 @@ ul {
   margin-top: 8px;
 }
 
-.game-replay > button {
+.game-replay>button {
   display: none;
 }
 
-.game-replay > button.show {
+.game-replay>button.show {
   display: inline-block;
 }
 
-.game-replay > button {
+.game-replay>button {
   border: none;
   box-shadow: none;
   background: white;
